@@ -115,7 +115,7 @@ public final class SystemGraphBuilder {
     }
 
     private String sanitize(String value) {
-        String result = value.trim().replace(""", "").replace("'", "");
+        String result = value.trim().replace("\\\"", "").replace("'", "");
         return result.isBlank() ? "application" : result;
     }
 
