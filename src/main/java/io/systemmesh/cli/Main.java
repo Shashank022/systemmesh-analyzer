@@ -2,6 +2,9 @@ package io.systemmesh.cli;
 
 import io.systemmesh.engine.AnalysisEngine;
 import io.systemmesh.engine.ProjectScanner;
+import io.systemmesh.graph.SystemGraphBuilder;
+import io.systemmesh.report.GraphJsonReporter;
+import io.systemmesh.report.GraphTextReporter;
 import io.systemmesh.report.JsonReporter;
 import io.systemmesh.report.TextReporter;
 import io.systemmesh.rules.Rules;
@@ -27,13 +30,26 @@ public final class Main {
             return;
         }
 
+        if ("graph".equals(args[0])) {
+            Path root = commandPath(args);
+            String format = option(args, "--format", "text");
+            var context = new ProjectScanner().scan(root.toAbsolutePath().normalize());
+            var graph = new SystemGraphBuilder().build(context);
+            if ("json".equalsIgnoreCase(format)) {
+                new GraphJsonReporter().print(graph, System.out);
+            } else {
+                new GraphTextReporter().print(graph, System.out);
+            }
+            return;
+        }
+
         if (!"scan".equals(args[0])) {
             System.err.println("Unknown command: " + args[0]);
             usage();
             System.exit(2);
         }
 
-        Path root = args.length >= 2 && !args[1].startsWith("--") ? Path.of(args[1]) : Path.of(".");
+        Path root = commandPath(args);
         String format = option(args, "--format", "text");
 
         var context = new ProjectScanner().scan(root.toAbsolutePath().normalize());
@@ -53,6 +69,10 @@ public final class Main {
         }
     }
 
+    private static Path commandPath(String[] args) {
+        return args.length >= 2 && !args[1].startsWith("--") ? Path.of(args[1]) : Path.of(".");
+    }
+
     private static String option(String[] args, String name, String fallback) {
         int i = Arrays.asList(args).indexOf(name);
         return i >= 0 && i + 1 < args.length ? args[i + 1] : fallback;
@@ -64,6 +84,7 @@ public final class Main {
 
                 Usage:
                   systemmesh scan [path] [--format text|json] [--fail-on LOW|MEDIUM|HIGH|CRITICAL]
+                  systemmesh graph [path] [--format text|json]
                   systemmesh rules
                   systemmesh help
                 """);

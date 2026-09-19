@@ -6,7 +6,7 @@ SystemMesh is a static system-analysis platform for Java and distributed applica
 
 ## v0.1 foundation
 
-The first version provides a shared rule engine, CLI, text/JSON reporting, and starter rules across several system concerns.
+SystemMesh provides a shared rule engine, CLI, text/JSON reporting, starter rules, and a normalized **System Graph**.
 
 ### Starter rules
 
@@ -25,38 +25,25 @@ The first version provides a shared rule engine, CLI, text/JSON reporting, and s
 mvn clean test package
 ```
 
-## Run
+## Scan
 
 ```bash
 java -jar target/systemmesh-analyzer-0.1.0-SNAPSHOT.jar scan .
 ```
 
-JSON output:
+## Build the System Graph
 
 ```bash
-java -jar target/systemmesh-analyzer-0.1.0-SNAPSHOT.jar scan . --format json
+java -jar target/systemmesh-analyzer-0.1.0-SNAPSHOT.jar graph .
+java -jar target/systemmesh-analyzer-0.1.0-SNAPSHOT.jar graph . --format json
 ```
 
-List rules:
-
-```bash
-java -jar target/systemmesh-analyzer-0.1.0-SNAPSHOT.jar rules
-```
+The current graph connects services, Java classes, Kafka topics, configuration references, database access, and Feign downstream services.
 
 ## Direction
 
-SystemMesh will grow around one shared system model with rule packs for:
+Next comes **Change Impact**: compare a baseline with a candidate change and determine which nodes and relationships are newly affected.
 
-- Java / Spring
-- dependency and binary linkage
-- JPA / SQL / data access
-- resilience and failure amplification
-- Kafka and event-driven systems
-- Spring / Helm / Kubernetes configuration
-- caching
-- concurrency and resource budgets
-- architecture and change-impact analysis
-
-The long-term goal is a PR Guardian that answers:
+The long-term PR Guardian question is:
 
 > What could this change break or degrade when it is deployed?
